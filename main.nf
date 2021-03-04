@@ -429,6 +429,9 @@ Channel.from(summary.collect{ [it.key, it.value] })
 
 process get_busco_version {
 
+    cpus = 2
+    memory '2 GB'
+
     output:
     file "v_busco.txt" into ch_busco_version
 
@@ -439,6 +442,9 @@ process get_busco_version {
 }
 
 process get_software_versions {
+        cpus = 2
+    memory '2 GB'
+
     publishDir "${params.outdir}/pipeline_info", mode: params.publish_dir_mode,
         saveAs: { filename ->
                       if (filename.indexOf(".csv") > 0) filename
@@ -478,22 +484,27 @@ process get_software_versions {
 // required for FastQC and MultiQC: to ensure consistent naming for reports using sample IDs and allow non-unique file basenames with TSV input
 if (hasExtension(params.input, "tsv") || params.input_paths){
     process rename_short_read_fastqs {
+            cpus = 2
+    memory '2 GB'
+
         tag "$name"
 
         input:
         set val(name), val(group), file(reads) from ch_raw_short_reads
 
         output:
-        set val(name), val(group), path("${name}{_R1,_R2,}.fastq.gz", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
+        set val(name), val(group), path("${name}_eu{_R1,_R2,}.fastq", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
 
         script:
         if ( !params.single_end )
             """
             if ! [ -f "${name}_R1.fastq.gz" ]; then
-                ln -s "${reads[0]}" "${name}_R1.fastq.gz"
+               # ln -s "${reads[0]}" "${name}_R1.fastq.gz"
+                ln -s "${reads[0]}" "${name}_eu_R1.fastq"
             fi
             if ! [ -f "${name}_R2.fastq.gz" ]; then
-                ln -s "${reads[1]}" "${name}_R2.fastq.gz"
+                #ln -s "${reads[1]}" "${name}_R2.fastq.gz"
+                ln -s "${reads[1]}" "${name}_eu_R2.fastq"
             fi
             """
         else
@@ -514,6 +525,9 @@ if (hasExtension(params.input, "tsv") || params.input_paths){
 */
 
 process fastqc_raw {
+    cpus = 8
+    memory '8 GB'
+
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".zip") == -1 ? "QC_shortreads/fastqc/$filename" : null}
@@ -531,6 +545,9 @@ process fastqc_raw {
 }
 
 process fastp {
+        cpus = 8
+    memory '8 GB'
+
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".fastq.gz") == -1 ? "QC_shortreads/fastp/$name/$filename" : null}
@@ -564,6 +581,9 @@ process fastp {
 (ch_trimmed_short_reads, ch_trimmed_short_reads_remove_host) = ch_trimmed_short_reads.into(2)
 
 process host_bowtie2index {
+        cpus = 20
+    memory '20 GB'
+
     tag "${genome}"
 
     input:
@@ -581,6 +601,9 @@ process host_bowtie2index {
 }
 
 process remove_host {
+        cpus = 12
+    memory '12 GB'
+
     tag "${name}"
 
     publishDir "${params.outdir}/QC_shortreads/remove_host/", mode: params.publish_dir_mode,
@@ -648,6 +671,9 @@ else ch_trimmed_short_reads_remove_host.close()
  */
 if(!params.keep_phix) {
     process phix_download_db {
+            cpus = 2
+    memory '2 GB'
+
         tag "${genome}"
 
         input:
@@ -663,6 +689,9 @@ if(!params.keep_phix) {
     }
 
     process remove_phix {
+            cpus = 12
+    memory '12 GB'
+
         tag "$name"
 
         publishDir "${params.outdir}", mode: params.publish_dir_mode,
@@ -709,6 +738,9 @@ if(!params.keep_phix) {
 }
 
 process fastqc_trimmed {
+        cpus = 2
+    memory '2 GB'
+
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".zip") == -1 ? "QC_shortreads/fastqc/$filename" : null}
@@ -865,6 +897,9 @@ process nanoplot {
 */
 
 process centrifuge_db_preparation {
+        cpus = 8
+    memory '8 GB'
+
     input:
     file(db) from ch_centrifuge_db_file
 
@@ -882,6 +917,9 @@ ch_short_reads_centrifuge
     .set { ch_centrifuge_input }
 
 process centrifuge {
+        cpus = 24
+    memory '24 GB'
+
     tag "${name}-${db_name}"
     publishDir "${params.outdir}/Taxonomy/centrifuge/${name}", mode: params.publish_dir_mode,
             saveAs: {filename -> filename.indexOf(".krona") == -1 ? filename : null}
@@ -908,6 +946,9 @@ process centrifuge {
 }
 
 process kraken2_db_preparation {
+        cpus = 8
+    memory '8 GB'
+
     input:
     file(db) from ch_kraken2_db_file
 
@@ -925,6 +966,9 @@ ch_short_reads_kraken2
     .set { ch_kraken2_input }
 
 process kraken2 {
+        cpus = 24
+    memory '24 GB'
+
     tag "${name}-${db_name}"
     publishDir "${params.outdir}/Taxonomy/kraken2/${name}", mode: params.publish_dir_mode,
             saveAs: {filename -> filename.indexOf(".krona") == -1 ? filename : null}
@@ -951,6 +995,9 @@ process kraken2 {
 }
 
 process krona_db {
+        cpus = 2
+    memory '2 GB'
+
     output:
     file("taxonomy/taxonomy.tab") into ch_krona_db
 
@@ -969,6 +1016,9 @@ ch_centrifuge_to_krona
     .set { ch_krona_input }
 
 process krona {
+        cpus = 12
+    memory '12 GB'
+
     tag "${classifier}-${name}"
     publishDir "${params.outdir}/Taxonomy/${classifier}/${name}", mode: params.publish_dir_mode
 
@@ -1003,6 +1053,9 @@ if (params.coassemble_group) {
 
     // pool short reads for SPAdes assembly
     process pool_short_reads {
+            cpus = 8
+    memory '8 GB'
+
         tag "$name"
 
         input:
@@ -1068,6 +1121,13 @@ if (params.coassemble_group) {
 
 
 process megahit {
+        cpus = 48
+        memory '48 GB'
+
+        // cloud error strategy
+        errorStrategy = { task.exitStatus in [14,143,137,104,134,139] ? 'retry' : 'terminate' }
+        maxRetries = 3
+
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
         saveAs: {filename -> 
@@ -1090,7 +1150,8 @@ process megahit {
     mem = task.memory.toBytes()
     if ( !params.megahit_fix_cpu_1 || task.cpus == 1 )
         """
-        megahit ${params.megahit_options} -t "${task.cpus}" -m $mem $input -o MEGAHIT --out-prefix "${name}"
+        #megahit ${params.megahit_options} -t "${task.cpus}" -m $mem $input -o MEGAHIT --out-prefix "${name}"
+        megahit ${params.megahit_options} -t "46" $input -o MEGAHIT --out-prefix "${name}"
         gzip -c "MEGAHIT/${name}.contigs.fa" > "MEGAHIT/${name}.contigs.fa.gz"
         """
     else
@@ -1107,6 +1168,9 @@ ch_long_reads_spadeshybrid
     .set { ch_reads_spadeshybrid }
 
 process spadeshybrid {
+        cpus = 48
+    memory '48 GB'
+
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode, pattern: "${name}*",
         saveAs: {filename -> 
@@ -1152,6 +1216,14 @@ process spadeshybrid {
 
 
 process spades {
+        cpus = 52
+    memory '64 GB'
+
+        // cloud error strategy
+        errorStrategy = { task.exitStatus in [14,143,137,104,134,139] ? 'retry' : 'terminate' }
+        maxRetries = 3
+
+
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode, pattern: "${name}*",
         saveAs: {filename -> 
@@ -1176,7 +1248,7 @@ process spades {
         """
         metaspades.py \
             ${params.spades_options} \
-            --threads "${task.cpus}" \
+            --threads "48" \
             --memory $maxmem \
             --pe1-1 ${sr[0]} \
             --pe1-2 ${sr[1]} \
@@ -1195,6 +1267,9 @@ process spades {
 
 
 process quast {
+        cpus = 8
+    memory '8 GB'
+
     tag "$assembler-$name"
     publishDir "${params.outdir}/Assembly/$assembler", mode: params.publish_dir_mode
 
@@ -1243,6 +1318,9 @@ if (params.binning_map_mode == 'all'){
 
 
 process bowtie2 {
+        cpus = 24
+    memory '24 GB'
+
     tag "$assembler-$name"
     publishDir "${params.outdir}/Assembly/${assembler}/${name}_QC", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".bowtie2.log") > 0 ? filename : null}
@@ -1279,6 +1357,9 @@ ch_assembly_mapping_for_metabat = ch_assembly_mapping_for_metabat.groupTuple(by:
 ch_assembly_mapping_for_metabat = ch_assembly_mapping_for_metabat.dump(tag:'assembly_mapping_for_metabat')
 
 process metabat {
+        cpus = 24
+    memory '24 GB'
+
     tag "$assembler-$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
         saveAs: {filename -> (filename.indexOf(".bam") == -1 && filename.indexOf(".fastq.gz") == -1) ? "GenomeBinning/$filename" : null}
@@ -1318,6 +1399,9 @@ process metabat {
 }
 
 process busco_db_preparation {
+        cpus = 2
+    memory '2 GB'
+
     tag "${database.baseName}"
     publishDir "${params.outdir}/GenomeBinning/QC/BUSCO/", mode: params.publish_dir_mode,
         saveAs: {filename -> (params.save_busco_reference && filename.indexOf(".tar.gz") > 0) ? "reference/$filename" : null}
@@ -1345,6 +1429,9 @@ ch_metabat_bins
  * BUSCO: Quantitative measures for the assessment of genome assembly
  */
 process busco {
+        cpus = 24
+    memory '24 GB'
+
     tag "${bin}"
     publishDir "${params.outdir}/GenomeBinning/QC/BUSCO/", mode: params.publish_dir_mode
 
@@ -1418,6 +1505,9 @@ ch_busco_to_summary = ch_busco_to_summary.map{it[2]}
 ch_busco_plot = ch_busco_plot.groupTuple(by: [0,1])
 
 process busco_plot {
+        cpus = 2
+    memory '2 GB'
+
     tag "$assembler-$name"
     publishDir "${params.outdir}/GenomeBinning/QC/BUSCO/", mode: params.publish_dir_mode
 
@@ -1450,6 +1540,9 @@ process busco_plot {
 }
 
 process busco_summary {
+        cpus = 2
+    memory '2 GB'
+
     publishDir "${params.outdir}/GenomeBinning/QC/", mode: params.publish_dir_mode
 
     input:
@@ -1466,6 +1559,9 @@ process busco_summary {
 
 
 process quast_bins {
+        cpus = 12
+    memory '12 GB'
+
     tag "$assembler-$name"
     publishDir "${params.outdir}/GenomeBinning/QC/", mode: params.publish_dir_mode
 
@@ -1496,6 +1592,9 @@ process quast_bins {
 }
 
 process merge_quast_and_busco {
+        cpus = 2
+    memory '2 GB'
+
     publishDir "${params.outdir}/GenomeBinning/QC/", mode: params.publish_dir_mode
 
     input:
@@ -1527,6 +1626,9 @@ process merge_quast_and_busco {
  * CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
  */
 process cat_db {
+        cpus = 2
+    memory '2 GB'
+
     tag "${database.baseName}"
 
     input:
@@ -1549,6 +1651,9 @@ ch_metabat_bins_for_cat
     .set { ch_cat_input }
 
 process cat {
+        cpus = 2
+    memory '2 GB'
+
     tag "${assembler}-${name}-${db_name}"
     publishDir "${params.outdir}/Taxonomy/${assembler}", mode: params.publish_dir_mode,
     saveAs: {filename ->
@@ -1582,6 +1687,9 @@ process cat {
 */
 
 process multiqc {
+        cpus = 8
+    memory '8 GB'
+
     publishDir "${params.outdir}/MultiQC", mode: params.publish_dir_mode
 
     input:
@@ -1625,6 +1733,9 @@ process multiqc {
  * Output Description HTML
  */
 process output_documentation {
+        cpus = 2
+    memory '2 GB'
+
     publishDir "${params.outdir}/pipeline_info", mode: params.publish_dir_mode
 
     input:
