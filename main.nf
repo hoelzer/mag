@@ -570,7 +570,6 @@ process fastp {
     """
     fastp -w "${task.cpus}" -q "${qual}" --cut_by_quality5 \
         --cut_by_quality3 --cut_mean_quality "${trim_qual}"\
-        --adapter_sequence=${adapter} --adapter_sequence_r2=${adapter_reverse} \
         -i "${reads[0]}" $pe_input $pe_output1 $pe_output2
     """
 }
