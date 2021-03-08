@@ -429,8 +429,8 @@ Channel.from(summary.collect{ [it.key, it.value] })
 
 process get_busco_version {
 
-    //cpus = 2
-    //memory '2 GB'
+    cpus = 2
+    memory '2 GB'
 
     output:
     file "v_busco.txt" into ch_busco_version
