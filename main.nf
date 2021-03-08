@@ -493,18 +493,18 @@ if (hasExtension(params.input, "tsv") || params.input_paths){
         set val(name), val(group), file(reads) from ch_raw_short_reads
 
         output:
-        set val(name), val(group), path("${name}_eu{_R1,_R2,}.fastq", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
+        set val(name), val(group), path("${name}{_R1,_R2,}.fastq", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
 
         script:
         if ( !params.single_end )
             """
             if ! [ -f "${name}_R1.fastq.gz" ]; then
                # ln -s "${reads[0]}" "${name}_R1.fastq.gz"
-                ln -s "${reads[0]}" "${name}_eu_R1.fastq"
+                ln -s "${reads[0]}" "${name}_R1.fastq"
             fi
             if ! [ -f "${name}_R2.fastq.gz" ]; then
                 #ln -s "${reads[1]}" "${name}_R2.fastq.gz"
-                ln -s "${reads[1]}" "${name}_eu_R2.fastq"
+                ln -s "${reads[1]}" "${name}_R2.fastq"
             fi
             """
         else
