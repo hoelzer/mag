@@ -748,6 +748,10 @@ process fastqc_trimmed {
         cpus = 2
     memory '2 GB'
 
+        // cloud error strategy
+        errorStrategy = { task.exitStatus in [14,143,137,104,134,139] ? 'retry' : 'terminate' }
+        maxRetries = 3
+        
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".zip") == -1 ? "QC_shortreads/fastqc/$filename" : null}
