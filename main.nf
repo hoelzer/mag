@@ -442,8 +442,8 @@ process get_busco_version {
 }
 
 process get_software_versions {
-        //cpus = 2
-   // memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     publishDir "${params.outdir}/pipeline_info", mode: params.publish_dir_mode,
         saveAs: { filename ->
@@ -484,8 +484,8 @@ process get_software_versions {
 // required for FastQC and MultiQC: to ensure consistent naming for reports using sample IDs and allow non-unique file basenames with TSV input
 if (hasExtension(params.input, "tsv") || params.input_paths){
     process rename_short_read_fastqs {
-    //        cpus = 2
-    //memory '2 GB'
+            cpus = 2
+    memory '2 GB'
 
         tag "$name"
 
@@ -525,8 +525,8 @@ if (hasExtension(params.input, "tsv") || params.input_paths){
 */
 
 process fastqc_raw {
-    //cpus = 8
-    //memory '8 GB'
+    cpus = 2
+    memory '2 GB'
 
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
@@ -545,8 +545,8 @@ process fastqc_raw {
 }
 
 process fastp {
-    ////    cpus = 8
-    //memory '8 GB'
+    cpus = 8
+    memory '8 GB'
 
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
@@ -670,8 +670,8 @@ else ch_trimmed_short_reads_remove_host.close()
  */
 if(!params.keep_phix) {
     process phix_download_db {
-    //        cpus = 2
-    //memory '2 GB'
+            cpus = 2
+    memory '2 GB'
 
         tag "${genome}"
 
@@ -737,8 +737,8 @@ if(!params.keep_phix) {
 }
 
 process fastqc_trimmed {
-    //    cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     tag "$name"
     publishDir "${params.outdir}/", mode: params.publish_dir_mode,
@@ -994,8 +994,8 @@ process kraken2 {
 }
 
 process krona_db {
-   //     cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     output:
     file("taxonomy/taxonomy.tab") into ch_krona_db
@@ -1052,8 +1052,8 @@ if (params.coassemble_group) {
 
     // pool short reads for SPAdes assembly
     process pool_short_reads {
-    //        cpus = 8
-    //memory '8 GB'
+            cpus = 2
+    memory '2 GB'
 
         tag "$name"
 
@@ -1265,8 +1265,8 @@ process spades {
 
 
 process quast {
-    //    cpus = 8
-    //memory '8 GB'
+        cpus = 8
+    memory '8 GB'
 
     tag "$assembler-$name"
     publishDir "${params.outdir}/Assembly/$assembler", mode: params.publish_dir_mode
@@ -1397,8 +1397,8 @@ process metabat {
 }
 
 process busco_db_preparation {
-    //    cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     tag "${database.baseName}"
     publishDir "${params.outdir}/GenomeBinning/QC/BUSCO/", mode: params.publish_dir_mode,
@@ -1427,8 +1427,8 @@ ch_metabat_bins
  * BUSCO: Quantitative measures for the assessment of genome assembly
  */
 process busco {
-   //     cpus = 24
-    //memory '24 GB'
+        cpus = 8
+    memory '8 GB'
 
     tag "${bin}"
     publishDir "${params.outdir}/GenomeBinning/QC/BUSCO/", mode: params.publish_dir_mode
@@ -1503,8 +1503,8 @@ ch_busco_to_summary = ch_busco_to_summary.map{it[2]}
 ch_busco_plot = ch_busco_plot.groupTuple(by: [0,1])
 
 process busco_plot {
-   //     cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     tag "$assembler-$name"
     publishDir "${params.outdir}/GenomeBinning/QC/BUSCO/", mode: params.publish_dir_mode
@@ -1538,8 +1538,8 @@ process busco_plot {
 }
 
 process busco_summary {
-   //     cpus = 2
-   // memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     publishDir "${params.outdir}/GenomeBinning/QC/", mode: params.publish_dir_mode
 
@@ -1557,8 +1557,8 @@ process busco_summary {
 
 
 process quast_bins {
-   //     cpus = 12
-    //memory '12 GB'
+        cpus = 12
+    memory '12 GB'
 
     tag "$assembler-$name"
     publishDir "${params.outdir}/GenomeBinning/QC/", mode: params.publish_dir_mode
@@ -1590,8 +1590,8 @@ process quast_bins {
 }
 
 process merge_quast_and_busco {
-    //    cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     publishDir "${params.outdir}/GenomeBinning/QC/", mode: params.publish_dir_mode
 
@@ -1624,8 +1624,8 @@ process merge_quast_and_busco {
  * CAT: Bin Annotation Tool (BAT) are pipelines for the taxonomic classification of long DNA sequences and metagenome assembled genomes (MAGs/bins)
  */
 process cat_db {
-    //    cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     tag "${database.baseName}"
 
@@ -1685,8 +1685,8 @@ process cat {
 */
 
 process multiqc {
-    //    cpus = 8
-    //memory '8 GB'
+        cpus = 8
+    memory '8 GB'
 
     publishDir "${params.outdir}/MultiQC", mode: params.publish_dir_mode
 
@@ -1731,8 +1731,8 @@ process multiqc {
  * Output Description HTML
  */
 process output_documentation {
-   //     cpus = 2
-    //memory '2 GB'
+        cpus = 2
+    memory '2 GB'
 
     publishDir "${params.outdir}/pipeline_info", mode: params.publish_dir_mode
 
