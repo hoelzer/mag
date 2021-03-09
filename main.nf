@@ -1697,8 +1697,8 @@ process cat {
 */
 
 process multiqc {
-        cpus = 8
-    memory '8 GB'
+        cpus = 32
+    memory '40 GB'
 
     publishDir "${params.outdir}/MultiQC", mode: params.publish_dir_mode
 
