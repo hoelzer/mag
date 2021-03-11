@@ -957,8 +957,8 @@ process centrifuge {
 }
 
 process kraken2_db_preparation {
-   //     cpus = 8
-    //memory '8 GB'
+        cpus = 12
+    memory '16 GB'
 
     input:
     file(db) from ch_kraken2_db_file
