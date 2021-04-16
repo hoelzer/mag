@@ -441,6 +441,7 @@ process get_busco_version {
     """
 }
 
+/*
 process get_software_versions {
         cpus = 2
     memory '2 GB'
@@ -480,6 +481,7 @@ process get_software_versions {
     scrape_software_versions.py > software_versions_mqc.yaml
     """
 }
+*/
 
 // required for FastQC and MultiQC: to ensure consistent naming for reports using sample IDs and allow non-unique file basenames with TSV input
 if (hasExtension(params.input, "tsv") || params.input_paths){
@@ -1743,6 +1745,8 @@ process multiqc {
 /*
  * Output Description HTML
  */
+
+/*
 process output_documentation {
         cpus = 2
     memory '2 GB'
@@ -1761,6 +1765,8 @@ process output_documentation {
     markdown_to_html.py $output_docs -o results_description.html
     """
 }
+*/
+
 
 /*
  * Completion e-mail notification
