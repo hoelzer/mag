@@ -493,7 +493,7 @@ if (hasExtension(params.input, "tsv") || params.input_paths){
         set val(name), val(group), file(reads) from ch_raw_short_reads
 
         output:
-        #set val(name), val(group), path("${name}{_R1,_R2,}.fastq", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
+        //set val(name), val(group), path("${name}{_R1,_R2,}.fastq", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
 	set val(name), val(group), path("${name}{_R1,_R2,}.fastq.gz", includeInputs: true) into (ch_raw_short_reads_fastqc, ch_raw_short_reads_fastp)
 
         script:
