@@ -441,7 +441,7 @@ process get_busco_version {
     """
 }
 
-/*
+
 process get_software_versions {
         cpus = 2
     memory '2 GB'
@@ -463,25 +463,27 @@ process get_software_versions {
     """
     echo $workflow.manifest.version > v_pipeline.txt
     echo $workflow.nextflow.version > v_nextflow.txt
-    multiqc --version > v_multiqc.txt
-    fastqc --version > v_fastqc.txt
-    fastp -v 2> v_fastp.txt
-    megahit --version > v_megahit.txt
-    metabat2 -h 2> v_metabat.txt || true
-    NanoPlot --version > v_nanoplot.txt
-    filtlong --version > v_filtlong.txt
-    porechop --version > v_porechop.txt
-    NanoLyse --version > v_nanolyse.txt
-    spades.py --version > v_spades.txt
-    centrifuge --version > v_centrifuge.txt
-    kraken2 -v > v_kraken2.txt
-    CAT -v > v_cat.txt
-    quast -v > v_quast.txt
+    #multiqc --version > v_multiqc.txt
+    #fastqc --version > v_fastqc.txt
+    #fastp -v 2> v_fastp.txt
+    #megahit --version > v_megahit.txt
+    #metabat2 -h 2> v_metabat.txt || true
+    #NanoPlot --version > v_nanoplot.txt
+    #filtlong --version > v_filtlong.txt
+    #porechop --version > v_porechop.txt
+    #NanoLyse --version > v_nanolyse.txt
+    #spades.py --version > v_spades.txt
+    #centrifuge --version > v_centrifuge.txt
+    #kraken2 -v > v_kraken2.txt
+    #CAT -v > v_cat.txt
+    #quast -v > v_quast.txt
 
-    scrape_software_versions.py > software_versions_mqc.yaml
+    #scrape_software_versions.py > software_versions_mqc.yaml
+    echo "software versions... phh this works not on SLURM Allegro" > software_versions_mqc.yaml
+    echo "software versions... phh this works not on SLURM Allegro" > software_versions.csv
     """
 }
-*/
+
 
 // required for FastQC and MultiQC: to ensure consistent naming for reports using sample IDs and allow non-unique file basenames with TSV input
 if (hasExtension(params.input, "tsv") || params.input_paths){
