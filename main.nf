@@ -499,12 +499,12 @@ if (hasExtension(params.input, "tsv") || params.input_paths){
         if ( !params.single_end )
             """
             if ! [ -f "${name}_R1.fastq.gz" ]; then
-               # ln -s "${reads[0]}" "${name}_R1.fastq.gz"
-                ln -s "${reads[0]}" "${name}_R1.fastq"
+                ln -s "${reads[0]}" "${name}_R1.fastq.gz"
+               # ln -s "${reads[0]}" "${name}_R1.fastq"
             fi
             if ! [ -f "${name}_R2.fastq.gz" ]; then
-                #ln -s "${reads[1]}" "${name}_R2.fastq.gz"
-                ln -s "${reads[1]}" "${name}_R2.fastq"
+                ln -s "${reads[1]}" "${name}_R2.fastq.gz"
+               # ln -s "${reads[1]}" "${name}_R2.fastq"
             fi
             """
         else
