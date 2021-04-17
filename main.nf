@@ -1340,6 +1340,8 @@ process bowtie2 {
     publishDir "${params.outdir}/Assembly/${assembler}/${name}_QC", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".bowtie2.log") > 0 ? filename : null}
 
+    errorStrategy{task.exitStatus=1 ? 'ignore':'terminate'}
+
     input:
     set val(assembler), val(name), val(group), file(assembly), val(sampleToMap), val(sampleGroup), file(reads) from ch_bowtie2_input
 
