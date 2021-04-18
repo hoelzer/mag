@@ -1347,7 +1347,7 @@ process bowtie2 {
     set val(assembler), val(name), val(group), file(assembly), val(sampleToMap), val(sampleGroup), file(reads) from ch_bowtie2_input
 
     output:
-    set val(assembler), val(name), file("${assembler}-${name}-${sampleToMap}.bam"), file("${assembler}-${name}-${sampleToMap}.bam.bai") into ch_assembly_mapping_for_metabat optinal true
+    set val(assembler), val(name), file("${assembler}-${name}-${sampleToMap}.bam"), file("${assembler}-${name}-${sampleToMap}.bam.bai") into ch_assembly_mapping_for_metabat optional true
     set val(assembler), val(name), val(sampleToMap), file("*.bowtie2.log") into ch_assembly_mapping_stats optional true
 
     when:
