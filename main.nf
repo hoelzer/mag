@@ -1340,14 +1340,15 @@ process bowtie2 {
     publishDir "${params.outdir}/Assembly/${assembler}/${name}_QC", mode: params.publish_dir_mode,
         saveAs: {filename -> filename.indexOf(".bowtie2.log") > 0 ? filename : null}
 
-    errorStrategy{task.exitStatus=1 ? 'ignore':'terminate'}
+    //errorStrategy{task.exitStatus=1 ? 'ignore':'terminate'}
+    errorStrategy{'ignore'}
 
     input:
     set val(assembler), val(name), val(group), file(assembly), val(sampleToMap), val(sampleGroup), file(reads) from ch_bowtie2_input
 
     output:
-    set val(assembler), val(name), file("${assembler}-${name}-${sampleToMap}.bam"), file("${assembler}-${name}-${sampleToMap}.bam.bai") into ch_assembly_mapping_for_metabat
-    set val(assembler), val(name), val(sampleToMap), file("*.bowtie2.log") into ch_assembly_mapping_stats
+    set val(assembler), val(name), file("${assembler}-${name}-${sampleToMap}.bam"), file("${assembler}-${name}-${sampleToMap}.bam.bai") into ch_assembly_mapping_for_metabat optinal true
+    set val(assembler), val(name), val(sampleToMap), file("*.bowtie2.log") into ch_assembly_mapping_stats optional true
 
     when:
     !params.skip_binning
@@ -1356,6 +1357,7 @@ process bowtie2 {
     def map_name = "${assembler}-${name}-${sampleToMap}"
     def input = params.single_end ? "-U \"${reads}\"" :  "-1 \"${reads[0]}\" -2 \"${reads[1]}\""
         """
+	if [[ -s ${assembly} ]]; then 
         bowtie2-build --threads "${task.cpus}" "${assembly}" ref
         bowtie2 -p "${task.cpus}" -x ref $input 2>"${map_name}.bowtie2.log" | \
             samtools view -@ "${task.cpus}" -bS | \
@@ -1364,6 +1366,7 @@ process bowtie2 {
         if [ ${map_name} = "${assembler}-${name}-${name}" ] ; then
             mv "${map_name}.bowtie2.log" "${assembler}-${name}.bowtie2.log"
         fi
+	fi
         """
 }
 
