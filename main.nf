@@ -1391,7 +1391,7 @@ process metabat {
     val(min_length_unbinned) from params.min_length_unbinned_contigs
 
     output:
-    set val(assembler), val(name), file("MetaBAT2/*.fa") into (ch_metabat_bins, ch_metabat_bins_for_cat, ch_metabat_bins_quast)
+    set val(assembler), val(name), file("MetaBAT2/*.fa") into (ch_metabat_bins, ch_metabat_bins_for_cat, ch_metabat_bins_quast) optional true
     file("MetaBAT2/discarded/*")
     file("${assembler}-${assembly}-depth.txt.gz")
 
@@ -1405,16 +1405,17 @@ process metabat {
     metabat2 -t "${task.cpus}" -i "${assembly}" -a depth.txt -o "MetaBAT2/${assembler}-${name}" -m ${min_size} --unbinned --seed ${params.metabat_rng_seed}
 
     #save unbinned contigs above thresholds into individual files, dump others in one file
-    split_fasta.py "MetaBAT2/${assembler}-${name}.unbinned.fa" ${min_length_unbinned} ${max_unbinned} ${min_size}
+    if [[ -f "MetaBAT2/${assembler}-${name}.unbinned.fa" ]]; then
+       split_fasta.py "MetaBAT2/${assembler}-${name}.unbinned.fa" ${min_length_unbinned} ${max_unbinned} ${min_size}
+       #rename splitted file so that it doesnt end up in following processes
+       mv "MetaBAT2/${assembler}-${name}.unbinned.fa" "${assembler}-${name}.unbinned.fa"
+    fi
 
     mkdir MetaBAT2/discarded
     mv "MetaBAT2/${assembler}-${name}.lowDepth.fa" MetaBAT2/discarded/
     mv "MetaBAT2/${assembler}-${name}.tooShort.fa" MetaBAT2/discarded/
     mv "MetaBAT2/${assembler}-${name}.unbinned.pooled.fa" MetaBAT2/discarded/
     mv "MetaBAT2/${assembler}-${name}.unbinned.remaining.fa" MetaBAT2/discarded/
-
-    #rename splitted file so that it doesnt end up in following processes
-    mv "MetaBAT2/${assembler}-${name}.unbinned.fa" "${assembler}-${name}.unbinned.fa"
     """
 }
 
