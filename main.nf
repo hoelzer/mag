@@ -1707,7 +1707,7 @@ process cat {
 ================================================================================
 */
 
-/*
+
 process multiqc {
         cpus = 32
     memory '40 GB'
@@ -1727,30 +1727,20 @@ process multiqc {
     file workflow_summary from ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml")
 
     output:
-    file "*multiqc_report.html" into ch_multiqc_report
-    file "*_data"
-    file "multiqc_plots"
+    file "multiqc.txt"
 
     script:
-    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
-    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
-    custom_config_file = params.multiqc_config ? "--config $mqc_custom_config" : ''
-    read_type = params.single_end ? "--single_end" : ''
     if ( params.host_fasta || params.host_genome ) {
         """
-        # get multiqc parsed data for bowtie 2
-        multiqc -f $rtitle $rfilename $custom_config_file *.bowtie2.log
-        multiqc_to_custom_tsv.py ${read_type}
-        # run multiqc using custom content file instead of original bowtie2 log files
-        multiqc -f $rtitle $rfilename $custom_config_file --ignore "*.bowtie2.log" .
+	touch multiqc.txt
         """
     } else {
         """
-        multiqc -f $rtitle $rfilename $custom_config_file .
+	touch multiqc.txt
         """
     }
 }
-*/
+
 
 /*
  * Output Description HTML
