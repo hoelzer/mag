@@ -1707,6 +1707,7 @@ process cat {
 ================================================================================
 */
 
+/*
 process multiqc {
         cpus = 32
     memory '40 GB'
@@ -1749,6 +1750,7 @@ process multiqc {
         """
     }
 }
+*/
 
 /*
  * Output Description HTML
